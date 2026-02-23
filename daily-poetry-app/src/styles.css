@@ -438,6 +438,17 @@ body::after {
   gap: 0.45rem;
 }
 
+.share-feedback {
+  border-radius: 999px;
+  padding: 0.28rem 0.62rem;
+  background: color-mix(in srgb, var(--poem-card-bg) 72%, var(--panel-bg) 28%);
+  color: var(--subtle-text);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: 0 6px 14px rgba(20, 17, 14, 0.1);
+}
+
 .heart-button,
 .share-button {
   border: 0;

@@ -66,6 +66,11 @@ export function TodayView({
           </article>
 
           <div className="poem-actions" aria-label="Poem actions">
+            {shareState === "copied" ? (
+              <span className="share-feedback" role="status" aria-live="polite">
+                Copied
+              </span>
+            ) : null}
             <button
               className="share-button"
               type="button"
