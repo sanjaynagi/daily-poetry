@@ -430,7 +430,7 @@ body::after {
 
 .poem-actions {
   position: absolute;
-  right: 0.9rem;
+  right: 1.2rem;
   bottom: 0;
   transform: translateY(50%);
   display: flex;
