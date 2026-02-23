@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://daily-poetry.com/sitemap.xml

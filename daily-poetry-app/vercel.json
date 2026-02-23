@@ -1,0 +1,16 @@
+{
+  "rewrites": [
+    {
+      "source": "/app",
+      "destination": "/"
+    },
+    {
+      "source": "/app/:path*",
+      "destination": "/"
+    },
+    {
+      "source": "/poems/:path*",
+      "destination": "/"
+    }
+  ]
+}

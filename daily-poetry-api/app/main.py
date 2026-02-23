@@ -13,12 +13,14 @@ from app.config import get_cors_origins
 from app.database import engine, get_db
 from app.migrate import run_sql_migrations
 from app.schemas import (
+    ArchiveResponse,
     AnonymousAuthResponse,
     CreateFavouriteRequest,
     DailyResponse,
     FavouritesResponse,
     NotificationPreferencePayload,
     NotificationPreferenceRequest,
+    PoemDetailResponse,
     NotificationSubscriptionResponse,
     PushSubscriptionDeleteRequest,
     PushSubscriptionRequest,
@@ -27,7 +29,9 @@ from app.service import (
     create_favourite,
     delete_push_subscription,
     delete_favourite,
+    fetch_archive_payload,
     fetch_daily_payload,
+    fetch_poem_payload,
     fetch_user_favourites,
     get_or_create_user_by_token,
     get_notification_preference,
@@ -67,6 +71,17 @@ def post_anonymous_auth(db: Session = Depends(get_db)) -> dict:
 @app.get("/v1/daily", response_model=DailyResponse)
 def get_daily(db: Session = Depends(get_db)) -> dict:
     return fetch_daily_payload(db)
+
+
+@app.get("/v1/poems/{poem_id}", response_model=PoemDetailResponse)
+def get_poem(poem_id: str, db: Session = Depends(get_db)) -> dict:
+    return fetch_poem_payload(db, poem_id)
+
+
+@app.get("/v1/archive", response_model=ArchiveResponse)
+def get_archive(limit: int = 365, db: Session = Depends(get_db)) -> dict:
+    safe_limit = max(1, min(limit, 2000))
+    return fetch_archive_payload(db, limit=safe_limit)
 
 
 @app.get("/v1/me/favourites", response_model=FavouritesResponse)

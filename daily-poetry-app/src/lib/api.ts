@@ -1,7 +1,7 @@
 import { API_BASE_URL, STORAGE_KEYS } from "./constants";
 import { mockDailyPoem } from "./mockData";
 import { readJson, writeJson } from "./storage";
-import type { DailyPoemResponse, FavouritePoem, NotificationPreference } from "../types/poetry";
+import type { ArchiveItem, DailyPoemResponse, FavouritePoem, NotificationPreference, PoemDetailResponse } from "../types/poetry";
 
 type RawFavourite = {
   poem_id?: string;
@@ -113,6 +113,33 @@ export async function fetchDailyPoem(): Promise<{ data: DailyPoemResponse; fromC
     writeJson(STORAGE_KEYS.cachedDaily, mockDailyPoem);
     return { data: mockDailyPoem, fromCache: true };
   }
+}
+
+export async function fetchPoemById(poemId: string): Promise<PoemDetailResponse> {
+  const endpoint = `${API_BASE_URL}/v1/poems/${encodeURIComponent(poemId)}`;
+  const response = await fetch(endpoint, { headers: { Accept: "application/json" } });
+  if (!response.ok) {
+    throw new Error(`poem endpoint returned ${response.status}`);
+  }
+  return (await response.json()) as PoemDetailResponse;
+}
+
+export async function fetchArchive(limit = 365): Promise<ArchiveItem[]> {
+  const endpoint = `${API_BASE_URL}/v1/archive?limit=${encodeURIComponent(String(limit))}`;
+  const response = await fetch(endpoint, { headers: { Accept: "application/json" } });
+  if (!response.ok) {
+    throw new Error(`archive endpoint returned ${response.status}`);
+  }
+  const payload = (await response.json()) as unknown;
+  if (
+    typeof payload === "object" &&
+    payload !== null &&
+    "poems" in payload &&
+    Array.isArray((payload as { poems: unknown }).poems)
+  ) {
+    return (payload as { poems: ArchiveItem[] }).poems;
+  }
+  return [];
 }
 
 export async function fetchFavourites(): Promise<FavouritePoem[]> {

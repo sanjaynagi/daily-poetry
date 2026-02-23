@@ -1,9 +1,9 @@
 {
   "name": "daily-poetry",
   "short_name": "daily-poetry",
-  "id": "/",
-  "start_url": "/",
-  "scope": "/",
+  "id": "/app",
+  "start_url": "/app",
+  "scope": "/app",
   "display": "standalone",
   "background_color": "#f4f0e5",
   "theme_color": "#f4f0e5",

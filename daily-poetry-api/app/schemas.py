@@ -25,6 +25,23 @@ class DailyResponse(BaseModel):
     author: AuthorPayload
 
 
+class PoemDetailResponse(BaseModel):
+    poem: PoemPayload
+    author: AuthorPayload
+    date_featured: str | None
+
+
+class ArchiveItemResponse(BaseModel):
+    date_featured: str
+    poem_id: str
+    title: str
+    author: str
+
+
+class ArchiveResponse(BaseModel):
+    poems: list[ArchiveItemResponse]
+
+
 class FavouriteItem(BaseModel):
     poem_id: str
     title: str
