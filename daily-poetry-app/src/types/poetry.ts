@@ -14,6 +14,29 @@ export type DailyPoemResponse = {
   };
 };
 
+export type PoemDetailResponse = {
+  poem: {
+    id: string;
+    title: string;
+    text: string;
+    linecount: number;
+  };
+  author: {
+    id: string;
+    name: string;
+    bio_short: string;
+    image_url: string | null;
+  };
+  date_featured: string | null;
+};
+
+export type ArchiveItem = {
+  date_featured: string;
+  poem_id: string;
+  title: string;
+  author: string;
+};
+
 export type FavouritePoem = {
   poemId: string;
   title: string;

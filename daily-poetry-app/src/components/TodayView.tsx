@@ -9,6 +9,7 @@ type TodayViewProps = {
   favouriteSyncing: boolean;
   onToggleFavourite: () => void;
   showActualDate?: boolean;
+  permalinkHref?: string;
 };
 
 export function TodayView({
@@ -18,6 +19,7 @@ export function TodayView({
   favouriteSyncing,
   onToggleFavourite,
   showActualDate = false,
+  permalinkHref,
 }: TodayViewProps) {
   const topLogoSrc = theme === "dark" ? "/dailypoetry-light.png" : "/dailypoetry-dark.png";
   const [shareState, setShareState] = useState<"idle" | "copied">("idle");
@@ -58,6 +60,13 @@ export function TodayView({
       </div>
       <section className="panel">
         <p className="date-label">{dateLabel}</p>
+        {permalinkHref ? (
+          <p className="poem-permalink-row">
+            <a className="poem-permalink-link" href={permalinkHref}>
+              Permanent page
+            </a>
+          </p>
+        ) : null}
 
         <div className="poem-card-wrap">
           <article className="poem-card">

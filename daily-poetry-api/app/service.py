@@ -71,6 +71,67 @@ def fetch_daily_payload(db: Session) -> dict:
     }
 
 
+def fetch_poem_payload(db: Session, poem_id: str) -> dict:
+    latest_featured_date_subquery = (
+        select(models.DailySelection.poem_id, func.max(models.DailySelection.date).label("date_featured"))
+        .group_by(models.DailySelection.poem_id)
+        .subquery()
+    )
+
+    row = db.execute(
+        select(models.Poem, models.Author, latest_featured_date_subquery.c.date_featured)
+        .join(models.Author, models.Author.id == models.Poem.author_id)
+        .join(latest_featured_date_subquery, latest_featured_date_subquery.c.poem_id == models.Poem.id, isouter=True)
+        .where(models.Poem.id == poem_id)
+    ).one_or_none()
+    if row is None:
+        raise HTTPException(status_code=404, detail="Poem not found")
+
+    poem, author, date_featured = row
+    return {
+        "poem": {
+            "id": poem.id,
+            "title": poem.title,
+            "text": poem.text,
+            "linecount": poem.linecount,
+        },
+        "author": {
+            "id": author.id,
+            "name": author.name,
+            "bio_short": author.bio_short or "",
+            "image_url": author.image_url,
+        },
+        "date_featured": (
+            date_featured.isoformat()
+            if date_featured is not None and hasattr(date_featured, "isoformat")
+            else (str(date_featured) if date_featured is not None else None)
+        ),
+    }
+
+
+def fetch_archive_payload(db: Session, *, limit: int = 365) -> dict:
+    stmt = (
+        select(models.DailySelection, models.Poem, models.Author)
+        .join(models.Poem, models.Poem.id == models.DailySelection.poem_id)
+        .join(models.Author, models.Author.id == models.Poem.author_id)
+        .order_by(models.DailySelection.date.desc())
+        .limit(limit)
+    )
+    rows = db.execute(stmt).all()
+
+    poems: list[dict] = []
+    for daily, poem, author in rows:
+        poems.append(
+            {
+                "date_featured": daily.date.isoformat() if hasattr(daily.date, "isoformat") else str(daily.date),
+                "poem_id": poem.id,
+                "title": poem.title,
+                "author": author.name,
+            }
+        )
+    return {"poems": poems}
+
+
 def fetch_user_favourites(db: Session, user: models.User) -> list[dict]:
     date_subquery = (
         select(models.DailySelection.poem_id, func.max(models.DailySelection.date).label("date_featured"))

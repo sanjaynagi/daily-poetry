@@ -136,6 +136,91 @@ body::after {
   min-height: calc(var(--viewport-height) - 8.8rem);
 }
 
+.landing-shell {
+  min-height: calc(var(--viewport-height) - 8rem);
+  display: grid;
+  align-content: center;
+  gap: 0.5rem;
+}
+
+.landing-panel {
+  width: min(680px, 100%);
+  margin: 0 auto;
+  padding: 1.25rem 1.25rem 1.35rem;
+}
+
+.landing-title {
+  margin: 0;
+  font-size: clamp(1.9rem, 4vw, 2.65rem);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  text-align: center;
+}
+
+.landing-copy {
+  margin: 0.85rem 0 0;
+  color: var(--subtle-text);
+  font-size: 1rem;
+  max-width: 44ch;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.landing-actions {
+  margin-top: 1.25rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.landing-cta {
+  text-decoration: none;
+  border: 1px solid color-mix(in srgb, var(--brand-accent) 45%, var(--panel-border) 55%);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--brand-accent-soft) 95%, white 5%),
+      color-mix(in srgb, var(--brand-accent-soft) 78%, var(--panel-bg) 22%)
+    );
+  color: var(--text-main);
+  border-radius: 999px;
+  padding: 0.88rem 1.5rem;
+  min-width: min(320px, 100%);
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.04rem;
+  letter-spacing: 0.01em;
+  box-shadow: 0 8px 18px rgba(20, 17, 14, 0.08);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.landing-cta:hover {
+  transform: translateY(-1px);
+}
+
+.app-home-link {
+  position: fixed;
+  top: calc(1.55rem + env(safe-area-inset-top));
+  left: max(1.2rem, calc(env(safe-area-inset-left) + 0.3rem));
+  z-index: 30;
+  text-decoration: none;
+  color: var(--subtle-text);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  background: color-mix(in srgb, var(--panel-bg) 86%, transparent);
+  border: 1px solid color-mix(in srgb, var(--panel-border) 70%, transparent);
+  box-shadow: 0 8px 20px rgba(20, 17, 14, 0.08);
+}
+
+.app-home-link:hover {
+  color: var(--text-main);
+}
+
 .loading-splash {
   min-height: calc(var(--viewport-height) - 12rem);
   display: flex;
@@ -293,6 +378,22 @@ body::after {
   font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.01em;
+}
+
+.poem-permalink-row {
+  margin: 0.35rem 0 0;
+}
+
+.poem-permalink-link {
+  color: var(--brand-accent);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.poem-permalink-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
 }
 
 .notification-panel {
@@ -633,9 +734,17 @@ body::after {
 .heart-button:focus-visible,
 .share-button:focus-visible,
 .notification-switch:focus-visible,
-.tab-btn:focus-visible {
+.tab-btn:focus-visible,
+.landing-cta:focus-visible,
+.app-home-link:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--brand-accent) 70%, white 30%);
   outline-offset: 2px;
+}
+
+.poem-permalink-link:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--brand-accent) 70%, white 30%);
+  outline-offset: 2px;
+  border-radius: 0.35rem;
 }
 
 @keyframes fade-in-up {
@@ -676,6 +785,20 @@ body::after {
     padding-left: 1rem;
     padding-right: 1rem;
     padding-bottom: 6.3rem;
+  }
+
+  .landing-panel {
+    padding: 1.05rem;
+  }
+
+  .landing-copy {
+    font-size: 0.95rem;
+  }
+
+  .app-home-link {
+    top: calc(1.2rem + env(safe-area-inset-top));
+    left: max(0.85rem, calc(env(safe-area-inset-left) + 0.2rem));
+    padding: 0.3rem 0.62rem;
   }
 
   .top-logo {

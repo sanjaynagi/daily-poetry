@@ -60,6 +60,20 @@ def test_api_endpoints() -> None:
         assert daily_payload["poem"]["id"] == poem_id
         assert daily_payload["author"]["name"] == author_name
 
+        poem_response = client.get(f"/v1/poems/{poem_id}")
+        assert poem_response.status_code == 200
+        poem_payload = poem_response.json()
+        assert poem_payload["poem"]["id"] == poem_id
+        assert poem_payload["author"]["name"] == author_name
+        assert poem_payload["date_featured"] == today.isoformat()
+
+        archive_response = client.get("/v1/archive")
+        assert archive_response.status_code == 200
+        archive_payload = archive_response.json()
+        assert len(archive_payload["poems"]) >= 1
+        assert archive_payload["poems"][0]["poem_id"] == poem_id
+        assert archive_payload["poems"][0]["date_featured"] == today.isoformat()
+
         unauthorized = client.get("/v1/me/favourites")
         assert unauthorized.status_code == 401
 
