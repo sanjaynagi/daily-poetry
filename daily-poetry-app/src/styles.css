@@ -529,6 +529,18 @@ body::after {
   line-height: 1.52;
 }
 
+.author-bio-toggle {
+  margin: 0.3rem 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--author-bio);
+  line-height: 1.52;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
 .poem-actions {
   position: absolute;
   right: 1.2rem;
@@ -736,7 +748,8 @@ body::after {
 .notification-switch:focus-visible,
 .tab-btn:focus-visible,
 .landing-cta:focus-visible,
-.app-home-link:focus-visible {
+.app-home-link:focus-visible,
+.author-bio-toggle:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--brand-accent) 70%, white 30%);
   outline-offset: 2px;
 }

@@ -9,7 +9,6 @@ type TodayViewProps = {
   favouriteSyncing: boolean;
   onToggleFavourite: () => void;
   showActualDate?: boolean;
-  permalinkHref?: string;
 };
 
 export function TodayView({
@@ -19,15 +18,17 @@ export function TodayView({
   favouriteSyncing,
   onToggleFavourite,
   showActualDate = false,
-  permalinkHref,
 }: TodayViewProps) {
   const topLogoSrc = theme === "dark" ? "/dailypoetry-light.png" : "/dailypoetry-dark.png";
   const [shareState, setShareState] = useState<"idle" | "copied">("idle");
+  const [isBioExpanded, setIsBioExpanded] = useState(false);
   const dateLabel = showActualDate ? formatIsoDate(daily.date, "long") : "Today";
   const authorBio =
     typeof daily.author.bio_short === "string" && daily.author.bio_short.trim()
       ? daily.author.bio_short.trim()
       : "Author bio coming soon.";
+  const canExpandBio = authorBio.length > 140;
+  const displayedBio = canExpandBio && !isBioExpanded ? `${authorBio.slice(0, 140).trimEnd()}...` : authorBio;
 
   async function handleShare() {
     const text = `${daily.poem.title}\nby ${daily.author.name}\n\n${daily.poem.text}`;
@@ -60,13 +61,6 @@ export function TodayView({
       </div>
       <section className="panel">
         <p className="date-label">{dateLabel}</p>
-        {permalinkHref ? (
-          <p className="poem-permalink-row">
-            <a className="poem-permalink-link" href={permalinkHref}>
-              Permanent page
-            </a>
-          </p>
-        ) : null}
 
         <div className="poem-card-wrap">
           <article className="poem-card">
@@ -118,7 +112,18 @@ export function TodayView({
             ) : null}
             <div>
               <p className="author-name">{daily.author.name}</p>
-              <p className="author-bio">{authorBio}</p>
+              {canExpandBio ? (
+                <button
+                  className="author-bio-toggle"
+                  type="button"
+                  aria-expanded={isBioExpanded}
+                  onClick={() => setIsBioExpanded((current) => !current)}
+                >
+                  {displayedBio}
+                </button>
+              ) : (
+                <p className="author-bio">{authorBio}</p>
+              )}
             </div>
           </div>
         </footer>

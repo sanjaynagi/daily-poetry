@@ -118,13 +118,12 @@ function LandingView({
             {landingHeadline}
           </h1>
           <p className="landing-copy">Read today&apos;s featured poem and build a quiet daily reading habit.</p>
-
-          <div className="landing-actions">
-            <a className="landing-cta" href="/app" onClick={(event) => onNavigate(event, "/app")}>
-              Today&apos;s poem
-            </a>
-          </div>
         </section>
+        <div className="landing-actions">
+          <a className="landing-cta" href="/app" onClick={(event) => onNavigate(event, "/app")}>
+            Today&apos;s poem
+          </a>
+        </div>
       </section>
     </main>
   );
@@ -355,7 +354,6 @@ function PoetryAppShell({
             isFavourite={isFavourite(daily.poem.id)}
             favouriteSyncing={syncingFavourites}
             onToggleFavourite={() => void toggleFavourite(daily)}
-            permalinkHref={`/poems/${encodeURIComponent(daily.poem.id)}`}
           />
         ) : null}
 
@@ -419,7 +417,7 @@ function App() {
 
   useEffect(() => {
     if (route.kind === "app") {
-      const title = "daily-poetry app | poetry, one day at a time";
+      const title = "daily-poetry";
       const description = "Read today's featured poem on daily-poetry, save favourites, and return each day for a new poem.";
       const canonicalUrl = `${SITE_ORIGIN}/app`;
 
