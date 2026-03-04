@@ -7,7 +7,7 @@ from pathlib import Path
 
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import OperationalError, ProgrammingError
 
 
 def _coerce_postgres_notification_flag_columns_to_boolean(connection) -> None:
@@ -79,7 +79,7 @@ def run_sql_migrations(engine: Engine) -> None:
 
                     try:
                         connection.execute(text(sql_statement))
-                    except OperationalError as exc:
+                    except (OperationalError, ProgrammingError) as exc:
                         message = str(exc).lower()
                         if (
                             dialect_name == "sqlite"
@@ -95,7 +95,10 @@ def run_sql_migrations(engine: Engine) -> None:
                             continue
                         # RENAME COLUMN on a column that no longer exists means it was
                         # already renamed in a previous run or by the ORM schema.
-                        if "rename" in sql_statement.lower() and "no such column" in message:
+                        # SQLite raises "no such column"; Postgres raises "does not exist".
+                        if "rename" in sql_statement.lower() and (
+                            "no such column" in message or "does not exist" in message
+                        ):
                             continue
                         raise
 
