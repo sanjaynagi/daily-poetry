@@ -52,7 +52,7 @@ def _upsert_authors(db: Session, author_rows: list[dict], poem_rows: list[dict])
                     "name": name.strip(),
                     "image_url": None,
                     "image_source": None,
-                    "bio_short": None,
+                    "bio": None,
                     "bio_source": None,
                     "bio_url": None,
                 },
@@ -65,7 +65,7 @@ def _upsert_authors(db: Session, author_rows: list[dict], poem_rows: list[dict])
                 "name": name.strip(),
                 "image_url": row.get("image_url") if isinstance(row.get("image_url"), str) else None,
                 "image_source": row.get("image_source") if isinstance(row.get("image_source"), str) else None,
-                "bio_short": row.get("bio_short") if isinstance(row.get("bio_short"), str) else None,
+                "bio": row.get("bio") if isinstance(row.get("bio"), str) else None,
                 "bio_source": row.get("bio_source") if isinstance(row.get("bio_source"), str) else None,
                 "bio_url": row.get("bio_url") if isinstance(row.get("bio_url"), str) else None,
             }
@@ -83,14 +83,14 @@ def _upsert_authors(db: Session, author_rows: list[dict], poem_rows: list[dict])
                 Author(
                     id=author_id,
                     name=name,
-                    bio_short=payload["bio_short"],
+                    bio=payload["bio"],
                     image_url=payload["image_url"],
                 )
             )
             id_map[name] = author_id
         else:
             model.name = name
-            model.bio_short = payload["bio_short"]
+            model.bio = payload["bio"]
             model.image_url = payload["image_url"]
             id_map[name] = model.id
 

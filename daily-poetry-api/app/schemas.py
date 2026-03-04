@@ -15,7 +15,7 @@ class PoemPayload(BaseModel):
 class AuthorPayload(BaseModel):
     id: str
     name: str
-    bio_short: str
+    bio: str
     image_url: str | None
 
 

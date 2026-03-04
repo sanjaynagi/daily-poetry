@@ -93,6 +93,10 @@ def run_sql_migrations(engine: Engine) -> None:
                             continue
                         if "duplicate column name" in message or "already exists" in message:
                             continue
+                        # RENAME COLUMN on a column that no longer exists means it was
+                        # already renamed in a previous run or by the ORM schema.
+                        if "rename" in sql_statement.lower() and "no such column" in message:
+                            continue
                         raise
 
         if dialect_name == "postgresql":

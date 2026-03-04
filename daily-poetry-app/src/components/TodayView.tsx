@@ -24,8 +24,8 @@ export function TodayView({
   const [isBioExpanded, setIsBioExpanded] = useState(false);
   const dateLabel = showActualDate ? formatIsoDate(daily.date, "long") : "Today";
   const authorBio =
-    typeof daily.author.bio_short === "string" && daily.author.bio_short.trim()
-      ? daily.author.bio_short.trim()
+    typeof daily.author.bio === "string" && daily.author.bio.trim()
+      ? daily.author.bio.trim()
       : "Author bio coming soon.";
   const canExpandBio = authorBio.length > 140;
   const displayedBio = canExpandBio && !isBioExpanded ? `${authorBio.slice(0, 140).trimEnd()}...` : authorBio;

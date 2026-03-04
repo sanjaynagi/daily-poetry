@@ -26,7 +26,7 @@ def test_editorial_list_and_status_update(tmp_path) -> None:
         session.query(Poem).delete()
         session.query(Author).delete()
         session.query(User).delete()
-        session.add(Author(id=author_id, name="Percy Bysshe Shelley", bio_short="", image_url=None))
+        session.add(Author(id=author_id, name="Percy Bysshe Shelley", bio="", image_url=None))
         session.add(
             Poem(
                 id=poem_id,

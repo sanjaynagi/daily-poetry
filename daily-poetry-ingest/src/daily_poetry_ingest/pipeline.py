@@ -197,12 +197,12 @@ def _build_report(
         "authors_enriched": len(author_records),
         "authors_without_images": sum(1 for record in author_records if record["image_url"] is None),
         "authors_with_bios": sum(
-            1 for record in author_records if isinstance(record.get("bio_short"), str) and record["bio_short"].strip()
+            1 for record in author_records if isinstance(record.get("bio"), str) and record["bio"].strip()
         ),
         "authors_without_bios": sum(
             1
             for record in author_records
-            if not (isinstance(record.get("bio_short"), str) and record["bio_short"].strip())
+            if not (isinstance(record.get("bio"), str) and record["bio"].strip())
         ),
         "canonical_poems": len(canonical),
         "duplicates": len(duplicates),

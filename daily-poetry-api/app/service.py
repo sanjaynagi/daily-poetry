@@ -65,7 +65,7 @@ def fetch_daily_payload(db: Session) -> dict:
         "author": {
             "id": author.id,
             "name": author.name,
-            "bio_short": author.bio_short or "",
+            "bio": author.bio or "",
             "image_url": author.image_url,
         },
     }
@@ -98,7 +98,7 @@ def fetch_poem_payload(db: Session, poem_id: str) -> dict:
         "author": {
             "id": author.id,
             "name": author.name,
-            "bio_short": author.bio_short or "",
+            "bio": author.bio or "",
             "image_url": author.image_url,
         },
         "date_featured": (

@@ -12,7 +12,7 @@ class AuthorImageTests(unittest.TestCase):
                 name="No Image",
                 image_url=None,
                 image_source=None,
-                bio_short=None,
+                bio=None,
                 bio_source=None,
                 bio_url=None,
             ),
@@ -28,7 +28,7 @@ class AuthorImageTests(unittest.TestCase):
         self.assertEqual(errors, [])
         self.assertEqual(records[0]["name"], "No Image")
         self.assertIsNone(records[0]["image_url"])
-        self.assertIsNone(records[0]["bio_short"])
+        self.assertIsNone(records[0]["bio"])
 
     def test_enrich_authors_sorts_and_keeps_source(self) -> None:
         mapping = {
@@ -36,7 +36,7 @@ class AuthorImageTests(unittest.TestCase):
                 name="B",
                 image_url="https://img/b.jpg",
                 image_source="wikipedia",
-                bio_short="B bio",
+                bio="B bio",
                 bio_source="wikipedia",
                 bio_url="https://en.wikipedia.org/wiki/B",
             ),
@@ -44,7 +44,7 @@ class AuthorImageTests(unittest.TestCase):
                 name="A",
                 image_url="https://img/a.jpg",
                 image_source="wikipedia",
-                bio_short="A bio",
+                bio="A bio",
                 bio_source="wikipedia",
                 bio_url="https://en.wikipedia.org/wiki/A",
             ),

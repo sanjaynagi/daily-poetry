@@ -33,7 +33,7 @@ def test_api_endpoints() -> None:
         session.commit()
 
         author_name = f"Percy Bysshe Shelley {uuid4()}"
-        author = Author(id=str(uuid4()), name=author_name, bio_short="Romantic poet", image_url=None)
+        author = Author(id=str(uuid4()), name=author_name, bio="Romantic poet", image_url=None)
         poem = Poem(
             id=str(uuid4()),
             title="Ozymandias",

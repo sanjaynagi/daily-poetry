@@ -14,7 +14,7 @@ def test_seed_from_artifacts_includes_author_image(tmp_path: Path) -> None:
     authors = [
         {
             "name": "Percy Bysshe Shelley",
-            "bio_short": "English Romantic poet known for lyrical verse.",
+            "bio": "English Romantic poet known for lyrical verse.",
             "image_url": "https://upload.wikimedia.org/example.jpg",
             "image_source": "wikipedia",
             "bio_source": "wikipedia",
@@ -66,7 +66,7 @@ def test_seed_from_artifacts_includes_author_image(tmp_path: Path) -> None:
 
     with TestSession() as session:
         author = session.query(Author).filter(Author.name == "Percy Bysshe Shelley").one()
-        assert author.bio_short == "English Romantic poet known for lyrical verse."
+        assert author.bio == "English Romantic poet known for lyrical verse."
         assert author.image_url == "https://upload.wikimedia.org/example.jpg"
 
 
@@ -114,13 +114,13 @@ def test_seed_updates_existing_author_bio_from_artifacts(tmp_path: Path) -> None
     authors_first = [
         {
             "name": "Emily Dickinson",
-            "bio_short": "First bio",
+            "bio": "First bio",
         }
     ]
     authors_second = [
         {
             "name": "Emily Dickinson",
-            "bio_short": "Updated bio",
+            "bio": "Updated bio",
         }
     ]
     poems = [
@@ -151,4 +151,4 @@ def test_seed_updates_existing_author_bio_from_artifacts(tmp_path: Path) -> None
 
     with TestSession() as session:
         author = session.query(Author).filter(Author.name == "Emily Dickinson").one()
-        assert author.bio_short == "Updated bio"
+        assert author.bio == "Updated bio"

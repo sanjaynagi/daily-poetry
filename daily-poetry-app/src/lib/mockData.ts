@@ -16,7 +16,7 @@ export const mockDailyPoem: DailyPoemResponse = {
   author: {
     id: "percy-bysshe-shelley",
     name: "Percy Bysshe Shelley",
-    bio_short: "English Romantic poet known for lyrical intensity and political radicalism.",
+    bio: "English Romantic poet known for lyrical intensity and political radicalism.",
     image_url: "https://upload.wikimedia.org/wikipedia/commons/6/64/Percy_Bysshe_Shelley_by_Alfred_Clint_1829.jpg",
   },
 };

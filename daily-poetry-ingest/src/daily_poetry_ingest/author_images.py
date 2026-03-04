@@ -21,7 +21,7 @@ class AuthorImageRecord:
     name: str
     image_url: str | None
     image_source: str | None
-    bio_short: str | None = None
+    bio: str | None = None
     bio_source: str | None = None
     bio_url: str | None = None
 
@@ -85,7 +85,7 @@ def resolve_author_image(
     backoff_seconds: float,
     *,
     enrich_bio: bool = True,
-    bio_max_chars: int = 280,
+    bio_max_chars: int = 0,
 ) -> AuthorImageRecord:
     """Resolve author image and optional bio metadata from Wikipedia."""
 
@@ -112,14 +112,14 @@ def resolve_author_image(
         image_url = _extract_thumbnail(page)
         image_source = "wikipedia" if image_url else None
 
-        bio_short: str | None = None
+        bio: str | None = None
         bio_source: str | None = None
         bio_url: str | None = None
         if enrich_bio:
             extract = page.get("extract")
             if isinstance(extract, str):
-                bio_short = _normalize_bio_text(extract, bio_max_chars)
-                if bio_short:
+                bio = _normalize_bio_text(extract, bio_max_chars)
+                if bio:
                     bio_source = "wikipedia"
                     title = page.get("title")
                     if isinstance(title, str) and title.strip():
@@ -127,12 +127,12 @@ def resolve_author_image(
                     else:
                         bio_url = _build_wikipedia_page_url(author)
 
-        if image_url or bio_short:
+        if image_url or bio:
             return AuthorImageRecord(
                 name=author,
                 image_url=image_url,
                 image_source=image_source,
-                bio_short=bio_short,
+                bio=bio,
                 bio_source=bio_source,
                 bio_url=bio_url,
             )
@@ -141,7 +141,7 @@ def resolve_author_image(
         name=author,
         image_url=None,
         image_source=None,
-        bio_short=None,
+        bio=None,
         bio_source=None,
         bio_url=None,
     )
@@ -155,7 +155,7 @@ def enrich_authors(
     rate_limit_rps: float,
     *,
     enrich_bios: bool = True,
-    bio_max_chars: int = 280,
+    bio_max_chars: int = 0,
 ) -> tuple[list[dict], list[dict]]:
     """Enrich a sorted list of unique authors with nullable metadata.
 
@@ -181,7 +181,7 @@ def enrich_authors(
                     "name": record.name,
                     "image_url": record.image_url,
                     "image_source": record.image_source,
-                    "bio_short": record.bio_short,
+                    "bio": record.bio,
                     "bio_source": record.bio_source,
                     "bio_url": record.bio_url,
                 }
@@ -192,7 +192,7 @@ def enrich_authors(
                     "name": author,
                     "image_url": None,
                     "image_source": None,
-                    "bio_short": None,
+                    "bio": None,
                     "bio_source": None,
                     "bio_url": None,
                 }
