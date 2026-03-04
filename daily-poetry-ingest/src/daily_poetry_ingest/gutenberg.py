@@ -14,6 +14,20 @@ _END_MARKER_RE = re.compile(r"\*\*\*\s*END OF (?:THE|THIS) PROJECT GUTENBERG EBO
 _NON_ALNUM_RE = re.compile(r"[^a-z0-9]+")
 _MULTISPACE_RE = re.compile(r"\s+")
 _WHITESPACE_LINE_RE = re.compile(r"^\s*$")
+
+# MARC name parsing
+_MARC_ROLE_RE = re.compile(r"\[([^\]]+)\]")
+_MARC_DATE_RE = re.compile(r",?\s*(?:ca\.\s*)?\d{4}\s*[-–]\s*\d{0,4}\.?")
+_MARC_PARENS_RE = re.compile(r"\s*\([^)]*\)")
+_SKIP_ROLES = {"editor", "translator", "illustrator", "compiler", "adapter", "arranger"}
+
+# Prose boilerplate detection
+_PROSE_MARKERS_RE = re.compile(
+    r"^(produced by|e-?text|transcribed by|prepared by|https?://|www\.|"
+    r"note:|project gutenberg|\[illustration|\[footnote|copyright\b|all rights reserved)",
+    re.IGNORECASE,
+)
+
 _HEADER_STOPWORDS = {
     "contents",
     "table of contents",
@@ -52,6 +66,80 @@ class GutenbergCandidate:
 def _normalize_token_string(value: str) -> str:
     collapsed = _NON_ALNUM_RE.sub(" ", value.casefold())
     return _MULTISPACE_RE.sub(" ", collapsed).strip()
+
+
+def _parse_marc_author(marc_name: str) -> str | None:
+    """Convert a MARC-format catalog author name to a natural display name.
+
+    Handles formats like ``"Surname, Forename (Alt), birth-death [Role]"``.
+    Returns ``None`` for editors, translators, or unresolvable entries.
+    For multi-author entries (semicolon-separated), uses the first author only.
+    """
+    # Use first author when multiple are listed
+    name = marc_name.split(";")[0].strip()
+
+    # Skip entries with non-poet roles (editor, translator, etc.)
+    role_match = _MARC_ROLE_RE.search(name)
+    if role_match:
+        role = role_match.group(1).strip().lower()
+        if any(skip in role for skip in _SKIP_ROLES):
+            return None
+        # Remove bracket from name for roles we do keep
+        name = name[: role_match.start()].strip()
+
+    # Non-MARC names (no comma) — return as-is: "Anonymous", "Walt Whitman"
+    if "," not in name:
+        return name.strip() or None
+
+    # Strip date ranges and parenthetical alternate names
+    name = _MARC_DATE_RE.sub("", name)
+    name = _MARC_PARENS_RE.sub("", name)
+
+    # Split "Surname, Forename" on first comma
+    parts = name.split(",", 1)
+    surname = parts[0].strip()
+    forename = parts[1].strip() if len(parts) > 1 else ""
+
+    # Clean stray punctuation left after substitutions
+    forename = re.sub(r"[,;]+", "", forename).strip()
+    forename = re.sub(r"\s+", " ", forename)
+
+    if not forename:
+        return surname or None
+
+    return f"{forename} {surname}"
+
+
+def _has_prose_boilerplate(lines: list[str]) -> bool:
+    """Return True when extracted lines look like prose front-matter rather than poetry.
+
+    Detects two signals:
+    - Explicit boilerplate markers (``"Produced by"``, URLs, copyright notices, etc.)
+      appearing in the first eight non-empty lines.
+    - Prose paragraphs: five or more consecutive non-blank lines whose average
+      word count exceeds ten words per line.
+    """
+    non_empty = [line for line in lines if line.strip()]
+
+    # Check for known boilerplate strings near the top
+    for line in non_empty[:8]:
+        if _PROSE_MARKERS_RE.match(line.strip()):
+            return True
+
+    # Detect prose paragraphs by tracking consecutive non-blank lines
+    run_count = 0
+    run_words = 0
+    for line in lines:
+        if line.strip():
+            run_count += 1
+            run_words += len(line.split())
+            if run_count >= 5 and run_words / run_count > 10:
+                return True
+        else:
+            run_count = 0
+            run_words = 0
+
+    return False
 
 
 def _parse_ebook_id(row: dict[str, str]) -> int | None:
@@ -105,11 +193,16 @@ def load_catalog_candidates(catalog_path: Path, *, language: str = "en") -> tupl
             if not _is_likely_single_poem_title(title):
                 continue
 
+            # Normalise MARC author name; skip non-poet roles (editors, translators)
+            clean_author = _parse_marc_author(author)
+            if not clean_author:
+                continue
+
             candidates.append(
                 GutenbergCandidate(
                     ebook_id=ebook_id,
                     title=title,
-                    author=author,
+                    author=clean_author,
                     language=row_language or language,
                 )
             )
@@ -245,7 +338,11 @@ def extract_strict_poem_lines(
     while lines and _WHITESPACE_LINE_RE.match(lines[-1]):
         lines.pop()
 
-    if not lines or not _is_strict_poem_shape(lines, max_non_empty_lines=max_non_empty_lines):
+    if not lines:
+        return None
+    if _has_prose_boilerplate(lines):
+        return None
+    if not _is_strict_poem_shape(lines, max_non_empty_lines=max_non_empty_lines):
         return None
     return lines
 

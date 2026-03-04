@@ -2,7 +2,13 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from daily_poetry_ingest.gutenberg import extract_strict_poem_lines, ingest_gutenberg_candidates, load_catalog_candidates
+from daily_poetry_ingest.gutenberg import (
+    _has_prose_boilerplate,
+    _parse_marc_author,
+    extract_strict_poem_lines,
+    ingest_gutenberg_candidates,
+    load_catalog_candidates,
+)
 
 
 _VALID_POEM_TEXT = """*** START OF THE PROJECT GUTENBERG EBOOK 9999 ***
@@ -136,6 +142,127 @@ by Walt Whitman
         self.assertEqual(poems_strict, [])
         self.assertEqual(len(errors_strict), 1)
         self.assertEqual(errors_strict[0]["kind"], "extract_error")
+
+
+class MarcAuthorParserTests(unittest.TestCase):
+    def test_simple_surname_forename(self) -> None:
+        self.assertEqual(_parse_marc_author("Whitman, Walt"), "Walt Whitman")
+
+    def test_strips_dates(self) -> None:
+        self.assertEqual(_parse_marc_author("Blake, William, 1757-1827"), "William Blake")
+
+    def test_strips_parens_and_dates(self) -> None:
+        self.assertEqual(
+            _parse_marc_author("Adams, Franklin P. (Franklin Pierce), 1881-1960"),
+            "Franklin P. Adams",
+        )
+
+    def test_multi_part_forename(self) -> None:
+        self.assertEqual(
+            _parse_marc_author("Browning, Elizabeth Barrett, 1806-1861"),
+            "Elizabeth Barrett Browning",
+        )
+
+    def test_non_marc_name_returned_as_is(self) -> None:
+        self.assertEqual(_parse_marc_author("Walt Whitman"), "Walt Whitman")
+        self.assertEqual(_parse_marc_author("Anonymous"), "Anonymous")
+
+    def test_editor_role_returns_none(self) -> None:
+        self.assertIsNone(_parse_marc_author("Abbot, Anne W. (Anne Wales), 1808-1908 [Editor]"))
+
+    def test_translator_role_returns_none(self) -> None:
+        self.assertIsNone(_parse_marc_author("Smith, John, 1800-1860 [Translator]"))
+
+    def test_multi_author_uses_first(self) -> None:
+        self.assertEqual(
+            _parse_marc_author("Adams, John G. (John Greenleaf), 1810-1887; Chapin, E. H. (Edwin Hubbell), 1814-1880"),
+            "John G. Adams",
+        )
+
+    def test_name_without_dates(self) -> None:
+        self.assertEqual(_parse_marc_author("Carroll, Lewis"), "Lewis Carroll")
+
+    def test_empty_string_returns_none(self) -> None:
+        self.assertIsNone(_parse_marc_author(""))
+
+
+class ProseBoilerplateTests(unittest.TestCase):
+    def _lines(self, text: str) -> list[str]:
+        return text.splitlines()
+
+    def test_produced_by_marker_detected(self) -> None:
+        lines = self._lines(
+            "Produced by Mark Meiss from page images\n"
+            "and the Online Distributed Proofreading Team.\n"
+            "\n"
+            "Some poem line here\n"
+        )
+        self.assertTrue(_has_prose_boilerplate(lines))
+
+    def test_url_marker_detected(self) -> None:
+        lines = self._lines("https://www.gutenberg.org/cache/epub/1234/\nSome content\n")
+        self.assertTrue(_has_prose_boilerplate(lines))
+
+    def test_prose_paragraph_detected(self) -> None:
+        # Five or more consecutive lines averaging well over 9 words (editorial note style)
+        lines = self._lines(
+            "The pieces gathered into this volume were, with two exceptions, written for the entertainment.\n"
+            "The editor would express her thanks to the writers who at her solicitation allowed them.\n"
+            "They are published with the hope of aiding a work of charity for poor people here.\n"
+            "Permission was graciously extended by the authors for publication in this charitable volume now.\n"
+            "All proceeds from the sale of this volume will be devoted to charitable purposes only.\n"
+        )
+        self.assertTrue(_has_prose_boilerplate(lines))
+
+    def test_clean_poem_not_detected(self) -> None:
+        lines = self._lines(
+            "O Captain! my Captain! our fearful trip is done,\n"
+            "The ship has weather'd every rack, the prize we sought is won,\n"
+            "\n"
+            "But O heart! heart! heart!\n"
+            "O the bleeding drops of red,\n"
+        )
+        self.assertFalse(_has_prose_boilerplate(lines))
+
+
+class ProseBoilerplateExtractionTests(unittest.TestCase):
+    def test_extract_rejects_front_matter_boilerplate(self) -> None:
+        text = (
+            "*** START OF THE PROJECT GUTENBERG EBOOK 1 ***\n"
+            "My Poem\n"
+            "by Some Author\n"
+            "\n"
+            "Produced by Mark Meiss from page images and corrected digital text\n"
+            "generously provided by the Wright American Fiction Project of the Library\n"
+            "Electronic Text Service of Indiana University.\n"
+            "\n"
+            "Note: Images of the original pages are available through this project.\n"
+            "\n"
+            "AUTUMN LEAVES.\n"
+            "Original Pieces in Prose and Verse.\n"
+            "Cambridge: John Bartlett. 1853.\n"
+            "*** END OF THE PROJECT GUTENBERG EBOOK 1 ***\n"
+        )
+        self.assertIsNone(extract_strict_poem_lines(text, "My Poem", "Some Author"))
+
+
+class MarcNameCatalogIntegrationTests(unittest.TestCase):
+    def test_marc_names_normalised_in_candidates(self) -> None:
+        with TemporaryDirectory() as tmp_dir:
+            csv_path = Path(tmp_dir) / "catalog.csv"
+            csv_path.write_text(
+                "Text#,Type,Title,Language,Authors,Subjects,Bookshelves,LoCC\n"
+                "10,Text,O Captain!,en,\"Whitman, Walt, 1819-1892\",Poetry,Poetry,PS\n"
+                "11,Text,The Raven,en,\"Poe, Edgar Allan, 1809-1849\",Poetry,Poetry,PS\n"
+                "12,Text,Anthology,en,\"Smith, Jane, 1800-1850 [Editor]\",Poetry,Poetry,PS\n",
+                encoding="utf-8",
+            )
+            candidates, _ = load_catalog_candidates(csv_path, language="en")
+
+        # Editor entry skipped; both poets have natural-order names
+        self.assertEqual(len(candidates), 2)
+        self.assertEqual(candidates[0].author, "Walt Whitman")
+        self.assertEqual(candidates[1].author, "Edgar Allan Poe")
 
 
 def _write_catalog(path: Path, *, rows: list[str]) -> Path:
