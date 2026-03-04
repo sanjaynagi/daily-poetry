@@ -251,7 +251,7 @@ function PoemPageView({
                 ) : null}
                 <div>
                   <p className="author-name">{poem.author.name}</p>
-                  <p className="author-bio">{poem.author.bio_short}</p>
+                  <p className="author-bio">{poem.author.bio}</p>
                 </div>
               </div>
             </footer>

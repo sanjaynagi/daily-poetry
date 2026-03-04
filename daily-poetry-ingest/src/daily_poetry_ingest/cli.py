@@ -38,7 +38,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--author-bio-max-chars",
         type=int,
-        default=280,
+        default=0,
         help="Maximum length for enriched author bios. <=0 keeps full text.",
     )
     parser.add_argument("--fetch-workers", type=int, default=None)

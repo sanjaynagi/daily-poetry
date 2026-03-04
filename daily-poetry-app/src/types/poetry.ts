@@ -9,7 +9,7 @@ export type DailyPoemResponse = {
   author: {
     id: string;
     name: string;
-    bio_short: string;
+    bio: string;
     image_url: string;
   };
 };
@@ -24,7 +24,7 @@ export type PoemDetailResponse = {
   author: {
     id: string;
     name: string;
-    bio_short: string;
+    bio: string;
     image_url: string | null;
   };
   date_featured: string | null;
