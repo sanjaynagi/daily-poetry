@@ -78,7 +78,10 @@ def run_sql_migrations(engine: Engine) -> None:
                         )
 
                     try:
-                        connection.execute(text(sql_statement))
+                        # Use a savepoint on Postgres so a caught error doesn't abort
+                        # the outer transaction and block all subsequent statements.
+                        with connection.begin_nested():
+                            connection.execute(text(sql_statement))
                     except (OperationalError, ProgrammingError) as exc:
                         message = str(exc).lower()
                         if (
