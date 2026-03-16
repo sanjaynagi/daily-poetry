@@ -313,7 +313,6 @@ function PoetryAppShell({
     void loadDailyPoem();
   }, []);
 
-  const dailyPoemLogoSrc = theme === "dark" ? "/dailypoetry-light.png" : "/dailypoetry-dark.png";
 
   return (
     <main className="page">
