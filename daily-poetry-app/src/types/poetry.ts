@@ -45,6 +45,13 @@ export type FavouritePoem = {
   poemText?: string;
 };
 
+export type PoetItem = {
+  id: string;
+  name: string;
+  bio: string | null;
+  image_url: string | null;
+};
+
 export type FavouritesSource = "remote" | "local";
 
 export type NotificationPreference = {

@@ -1,6 +1,7 @@
 import type { MouseEvent } from "react";
 import { useEffect, useState } from "react";
 import { FavouritesView } from "./components/FavouritesView";
+import { PoetsView } from "./components/PoetsView";
 import { TodayView } from "./components/TodayView";
 import { useFavourites } from "./hooks/useFavourites";
 import { useNotifications } from "./hooks/useNotifications";
@@ -9,7 +10,7 @@ import { STORAGE_KEYS } from "./lib/constants";
 import { formatIsoDate } from "./lib/date";
 import type { DailyPoemResponse, PoemDetailResponse } from "./types/poetry";
 
-type ViewMode = "daily_poem" | "favourites";
+type ViewMode = "daily_poem" | "favourites" | "poets";
 type ThemeMode = "light" | "dark";
 type AppRoute = { kind: "home" } | { kind: "app" } | { kind: "poem"; poemId: string };
 
@@ -372,6 +373,8 @@ function PoetryAppShell({
             onToggleNotifications={() => void toggleNotifications()}
           />
         ) : null}
+
+        {viewMode === "poets" ? <PoetsView /> : null}
       </section>
 
       <nav className="bottom-tabs" aria-label="Primary">
@@ -383,6 +386,18 @@ function PoetryAppShell({
         >
           <img className="tab-logo" src="/logo-mark.png" alt="" aria-hidden="true" />
           <span className="tab-label">Today</span>
+        </button>
+        <button
+          className={viewMode === "poets" ? "tab-btn tab-btn-active" : "tab-btn"}
+          type="button"
+          onClick={() => setViewMode("poets")}
+          aria-label="Browse poets"
+        >
+          <svg className="tab-poets-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="8" r="3.5" />
+            <path d="M4 20c0-4 3.58-7 8-7s8 3 8 7" />
+          </svg>
+          <span className="tab-label">Poets</span>
         </button>
         <button
           className={viewMode === "favourites" ? "tab-btn tab-btn-active" : "tab-btn"}

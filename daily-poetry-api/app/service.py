@@ -109,6 +109,20 @@ def fetch_poem_payload(db: Session, poem_id: str) -> dict:
     }
 
 
+def fetch_poets_payload(db: Session) -> dict:
+    rows = db.execute(select(models.Author).order_by(models.Author.name)).scalars().all()
+    poets = [
+        {
+            "id": author.id,
+            "name": author.name,
+            "bio": author.bio,
+            "image_url": author.image_url,
+        }
+        for author in rows
+    ]
+    return {"poets": poets}
+
+
 def fetch_archive_payload(db: Session, *, limit: int = 365) -> dict:
     stmt = (
         select(models.DailySelection, models.Poem, models.Author)

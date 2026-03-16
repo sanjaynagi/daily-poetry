@@ -22,6 +22,7 @@ from app.schemas import (
     NotificationPreferenceRequest,
     PoemDetailResponse,
     NotificationSubscriptionResponse,
+    PoetsResponse,
     PushSubscriptionDeleteRequest,
     PushSubscriptionRequest,
 )
@@ -32,6 +33,7 @@ from app.service import (
     fetch_archive_payload,
     fetch_daily_payload,
     fetch_poem_payload,
+    fetch_poets_payload,
     fetch_user_favourites,
     get_or_create_user_by_token,
     get_notification_preference,
@@ -76,6 +78,11 @@ def get_daily(db: Session = Depends(get_db)) -> dict:
 @app.get("/v1/poems/{poem_id}", response_model=PoemDetailResponse)
 def get_poem(poem_id: str, db: Session = Depends(get_db)) -> dict:
     return fetch_poem_payload(db, poem_id)
+
+
+@app.get("/v1/poets", response_model=PoetsResponse)
+def get_poets(db: Session = Depends(get_db)) -> dict:
+    return fetch_poets_payload(db)
 
 
 @app.get("/v1/archive", response_model=ArchiveResponse)
