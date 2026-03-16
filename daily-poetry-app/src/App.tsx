@@ -382,7 +382,7 @@ function PoetryAppShell({
           onClick={() => setViewMode("daily_poem")}
           aria-label="Today's poem"
         >
-          <img className="tab-logo" src={dailyPoemLogoSrc} alt="" aria-hidden="true" />
+          <img className="tab-logo" src="/logo-mark.png" alt="" aria-hidden="true" />
           <span className="tab-label">Today</span>
         </button>
         <button
