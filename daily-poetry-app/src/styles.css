@@ -801,7 +801,7 @@ body::after {
   right: 0;
   bottom: 0;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   align-items: center;
   padding: 0.55rem max(1rem, env(safe-area-inset-right)) calc(0.55rem + env(safe-area-inset-bottom))
     max(1rem, env(safe-area-inset-left));
@@ -870,6 +870,185 @@ body::after {
   fill: currentColor;
 }
 
+.tab-poets-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+  vertical-align: middle;
+}
+
+.tab-poets-icon circle,
+.tab-poets-icon path {
+  stroke: currentColor;
+  stroke-width: 1.8;
+  fill: transparent;
+  transition: fill 160ms ease;
+}
+
+.tab-btn-active .tab-poets-icon circle,
+.tab-btn-active .tab-poets-icon path {
+  fill: currentColor;
+}
+
+/* ─── Poets Gallery ──────────────────────────────────────────── */
+.poets-view {
+  animation: fade-in-up 360ms ease both;
+}
+
+.poets-header {
+  margin-bottom: 1.4rem;
+}
+
+.poets-title {
+  margin: 0;
+  font-size: clamp(1.7rem, 4vw, 2.2rem);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.poets-subtitle {
+  margin: 0.35rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-style: italic;
+}
+
+.poets-alphabet {
+  display: grid;
+  gap: 2rem;
+}
+
+.poets-section {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.poets-section-letter {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.poets-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+/* ─── Poet Card ──────────────────────────────────────────────── */
+.poet-card {
+  border-radius: 0.85rem;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.poet-card-expanded {
+  border-color: var(--accent-medium);
+  box-shadow: var(--shadow-md);
+}
+
+.poet-card-thumb {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  background: var(--card-bg);
+  overflow: hidden;
+  border-radius: 0;
+}
+
+.poet-card-thumb:hover .poet-card-overlay {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.18) 55%, transparent 100%);
+}
+
+.poet-card-thumb:hover .poet-card-image {
+  transform: scale(1.03);
+}
+
+.poet-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  transition: transform 300ms ease;
+}
+
+/* Monogram placeholder when no image is available */
+.poet-card-initial {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  font-weight: 400;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent-soft) 60%, var(--card-bg) 40%);
+  letter-spacing: -0.01em;
+  font-family: inherit;
+  user-select: none;
+}
+
+/* Name overlay burned into the bottom of the card */
+.poet-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.62) 0%, rgba(0, 0, 0, 0.1) 50%, transparent 100%);
+  display: flex;
+  align-items: flex-end;
+  padding: 0.65rem 0.7rem;
+  transition: background 200ms ease;
+}
+
+.poet-card-name {
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  text-align: left;
+}
+
+/* ─── Poet Bio Expansion Panel ───────────────────────────────── */
+.poet-bio-panel {
+  padding: 0.9rem 1rem 1rem;
+  background: var(--panel-bg);
+  border-top: 1px solid var(--border-subtle);
+  animation: fade-in-up 200ms ease both;
+}
+
+.poet-bio-name {
+  margin: 0 0 0.45rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+  color: var(--text-primary);
+}
+
+.poet-bio-text {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: var(--author-bio);
+}
+
 /* ─── Focus States ───────────────────────────────────────────── */
 .theme-toggle:focus-visible,
 .heart-button:focus-visible,
@@ -878,7 +1057,8 @@ body::after {
 .tab-btn:focus-visible,
 .landing-cta:focus-visible,
 .app-home-link:focus-visible,
-.author-bio-toggle:focus-visible {
+.author-bio-toggle:focus-visible,
+.poet-card-thumb:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--accent) 75%, white 25%);
   outline-offset: 2px;
 }
@@ -922,6 +1102,15 @@ body::after {
     padding-left: 1rem;
     padding-right: 1rem;
     padding-bottom: 6.8rem;
+  }
+
+  .poets-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+
+  .tab-label {
+    font-size: 0.58rem;
   }
 
   .poem-title {

@@ -91,3 +91,14 @@ class PushSubscriptionDeleteRequest(BaseModel):
 
 class NotificationSubscriptionResponse(BaseModel):
     subscription_id: str
+
+
+class PoetItem(BaseModel):
+    id: str
+    name: str
+    bio: str | None
+    image_url: str | None
+
+
+class PoetsResponse(BaseModel):
+    poets: list[PoetItem]
