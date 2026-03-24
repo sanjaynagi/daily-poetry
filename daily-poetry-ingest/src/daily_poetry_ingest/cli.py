@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 from pathlib import Path
 
 from daily_poetry_ingest.pipeline import (
@@ -41,6 +42,15 @@ def build_parser() -> argparse.ArgumentParser:
         default=0,
         help="Maximum length for enriched author bios. <=0 keeps full text.",
     )
+    parser.add_argument(
+        "--llm-disambiguate",
+        action="store_true",
+        default=False,
+        help=(
+            "Use an LLM to resolve Wikipedia disambiguation pages. "
+            "Requires ANTHROPIC_API_KEY to be set in the environment."
+        ),
+    )
     parser.add_argument("--fetch-workers", type=int, default=None)
     parser.add_argument("--normalize-workers", type=int, default=None)
     parser.add_argument("--gutenberg-catalog-csv", type=Path, default=None)
@@ -66,6 +76,13 @@ def main() -> None:
         fetch_workers = fetch_workers or auto_fetch
         normalize_workers = normalize_workers or auto_normalize
 
+    # Resolve Anthropic API key if LLM disambiguation is requested
+    anthropic_api_key: str | None = None
+    if args.llm_disambiguate:
+        anthropic_api_key = os.environ.get("ANTHROPIC_API_KEY", "").strip() or None
+        if anthropic_api_key is None:
+            parser.error("--llm-disambiguate requires ANTHROPIC_API_KEY to be set in the environment")
+
     if args.source == "poetrydb":
         report = run_poetrydb_ingestion(
             output_dir=args.output_dir,
@@ -78,6 +95,7 @@ def main() -> None:
             rate_limit_rps=args.rate_limit_rps,
             enrich_author_bios=args.enrich_author_bios,
             author_bio_max_chars=args.author_bio_max_chars,
+            anthropic_api_key=anthropic_api_key,
         )
     else:
         if args.gutenberg_catalog_csv is None:
@@ -96,6 +114,7 @@ def main() -> None:
             rate_limit_rps=args.rate_limit_rps,
             enrich_author_bios=args.enrich_author_bios,
             author_bio_max_chars=args.author_bio_max_chars,
+            anthropic_api_key=anthropic_api_key,
         )
     print_report(report)
 

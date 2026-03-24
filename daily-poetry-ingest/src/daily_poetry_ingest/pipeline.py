@@ -235,6 +235,7 @@ def run_poetrydb_ingestion(
     rate_limit_rps: float = 2.0,
     enrich_author_bios: bool = True,
     author_bio_max_chars: int = 280,
+    anthropic_api_key: str | None = None,
 ) -> dict:
     """Run ingestion end-to-end and write artifacts into output_dir."""
 
@@ -333,6 +334,7 @@ def run_poetrydb_ingestion(
         rate_limit_rps=rate_limit_rps,
         enrich_bios=enrich_author_bios,
         bio_max_chars=author_bio_max_chars,
+        anthropic_api_key=anthropic_api_key,
     )
     errors.extend(author_errors)
 
@@ -364,6 +366,7 @@ def run_gutenberg_ingestion(
     rate_limit_rps: float = 2.0,
     enrich_author_bios: bool = True,
     author_bio_max_chars: int = 280,
+    anthropic_api_key: str | None = None,
 ) -> dict:
     """Run strict Project Gutenberg ingestion and write standard artifacts."""
 
@@ -402,6 +405,7 @@ def run_gutenberg_ingestion(
         rate_limit_rps=rate_limit_rps,
         enrich_bios=enrich_author_bios,
         bio_max_chars=author_bio_max_chars,
+        anthropic_api_key=anthropic_api_key,
     )
     errors = metadata_errors + extract_errors + author_errors
 
@@ -434,6 +438,7 @@ def run_ingestion(
     rate_limit_rps: float = 2.0,
     enrich_author_bios: bool = True,
     author_bio_max_chars: int = 280,
+    anthropic_api_key: str | None = None,
 ) -> dict:
     """Backward-compatible alias for PoetryDB ingestion."""
 
@@ -448,6 +453,7 @@ def run_ingestion(
         rate_limit_rps=rate_limit_rps,
         enrich_author_bios=enrich_author_bios,
         author_bio_max_chars=author_bio_max_chars,
+        anthropic_api_key=anthropic_api_key,
     )
 
 

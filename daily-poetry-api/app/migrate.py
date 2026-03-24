@@ -63,6 +63,11 @@ def run_sql_migrations(engine: Engine) -> None:
     migration_files = sorted(migrations_dir.glob("*.sql"))
 
     with engine.begin() as connection:
+        if connection.dialect.name == "postgresql":
+            # Serialize concurrent cold-start migration runs (e.g. Vercel multi-instance).
+            # All instances acquire the same advisory lock; only one proceeds at a time.
+            connection.execute(text("SELECT pg_advisory_xact_lock(20240101)"))
+
         dialect_name = connection.dialect.name
         for migration_file in migration_files:
             sql_text = migration_file.read_text(encoding="utf-8")
